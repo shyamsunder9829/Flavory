@@ -5,6 +5,14 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
+// cookie options - use none+secure in production (for cross-site cookies over HTTPS)
+const isProd = process.env.NODE_ENV === 'production';
+const cookieOptions = {
+    httpOnly: true,
+    sameSite: isProd ? 'none' : 'lax',
+    secure: isProd
+};
+
 async function registerUser(req, res) {
     try {
         const { fullName, email, password } = req.body;
@@ -36,7 +44,7 @@ async function registerUser(req, res) {
         const token = jwt.sign({ id: user._id }, JWT_SECRET)
 
         // set cookie (httpOnly) and expose token in response for Authorization header fallback
-        res.cookie("token", token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie("token", token, cookieOptions)
 
         res.status(201).json({
             message: "User registered successfully",
@@ -74,7 +82,7 @@ async function loginUser(req, res) {
         const token = jwt.sign({ id: user._id }, JWT_SECRET)
 
         // set cookie (httpOnly) and expose token in response for Authorization header fallback
-        res.cookie("token", token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie("token", token, cookieOptions)
 
         res.status(200).json({
             message: "User logged in successfully",
@@ -92,7 +100,7 @@ async function loginUser(req, res) {
 } 
 
 function logoutUser(req, res) {
-    res.clearCookie("token");
+    res.clearCookie("token", cookieOptions);
     res.status(200).json({
         message: "User logged out successfully"
     });
@@ -127,7 +135,7 @@ async function registerFoodPartner(req, res) {
         const token = jwt.sign({ id: foodPartner._id }, JWT_SECRET)
 
         // set cookie (httpOnly) and expose token in response for Authorization header fallback
-        res.cookie("token", token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie("token", token, cookieOptions)
 
         res.status(201).json({
             message: "Food partner registered successfully",
@@ -168,7 +176,7 @@ async function loginFoodPartner(req, res) {
         const token = jwt.sign({ id: foodPartner._id }, JWT_SECRET)
 
         // set cookie (httpOnly) and expose token in response for Authorization header fallback
-        res.cookie("token", token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie("token", token, cookieOptions)
 
         res.status(200).json({
             message: "Food partner logged in successfully",
@@ -186,7 +194,7 @@ async function loginFoodPartner(req, res) {
 }
 
 function logoutFoodPartner(req, res) {
-    res.clearCookie("token");
+    res.clearCookie("token", cookieOptions);
     res.status(200).json({
         message: "Food partner logged out successfully"
     });
