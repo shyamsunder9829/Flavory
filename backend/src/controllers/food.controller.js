@@ -9,6 +9,10 @@ async function createFood(req, res) {
     try {
         if (!req.foodPartner) return res.status(401).json({ message: "Please login as food partner" });
 
+        if (!req.file) {
+            return res.status(400).json({ message: "No video file provided" })
+        }
+
         const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid())
 
         const foodItem = await foodModel.create({
@@ -21,6 +25,9 @@ async function createFood(req, res) {
         res.status(201).json({ message: "food created successfully", food: foodItem })
     } catch (err) {
         console.error('createFood error:', err);
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ message: 'File too large (max 150MB)' })
+        }
         res.status(500).json({ message: "Internal server error" });
     }
 }

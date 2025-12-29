@@ -24,10 +24,13 @@ const CreateFood = () => {
         return () => URL.revokeObjectURL(url);
     }, [ videoFile ]);
 
+    const MAX_FILE_BYTES = 100 * 1024 * 1024; // 100MB
+
     const onFileChange = (e) => {
         const file = e.target.files && e.target.files[ 0 ];
         if (!file) { setVideoFile(null); setFileError(''); return; }
         if (!file.type.startsWith('video/')) { setFileError('Please select a valid video file.'); return; }
+        if (file.size > MAX_FILE_BYTES) { setFileError('Video is too large (max 100MB).'); return; }
         setFileError('');
         setVideoFile(file);
     };
@@ -51,18 +54,41 @@ const CreateFood = () => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        if (!videoFile) {
+            setFileError('Please select a video before submitting.');
+            return;
+        }
+
+        // ensure auth header is present; set from localStorage if needed
+        if (!axios.defaults.headers.common['Authorization']) {
+            const tk = localStorage.getItem('token');
+            if (tk) axios.defaults.headers.common['Authorization'] = `Bearer ${tk}`;
+        }
+
+        if (!axios.defaults.headers.common['Authorization']) {
+            alert('Please login as a food partner to upload food');
+            return;
+        }
+
         const formData = new FormData();
 
         formData.append('name', name);
         formData.append('description', description);
         formData.append("mama", videoFile);
 
-        const response = await axios.post("/api/food", formData, {
-            withCredentials: true,
-        })
+        try {
+            const response = await axios.post("/api/food", formData, {
+                withCredentials: true,
+            })
 
-        console.log(response.data);
-        navigate("/home"); // Redirect to home after successful creation
+            console.log(response.data);
+            navigate("/home"); // Redirect to home after successful creation
+        } catch (err) {
+            const serverMessage = err.response?.data?.message;
+            alert(serverMessage || 'Failed to create food. Please try again.');
+            console.error('Create food error:', err);
+        }
+
         // Optionally reset
         // setName(''); setDescription(''); setVideoFile(null);
     };
@@ -86,6 +112,7 @@ const CreateFood = () => {
                             className="file-input-hidden"
                             type="file"
                             accept="video/*"
+                            capture="environment"
                             onChange={onFileChange}
                         />
 
