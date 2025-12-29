@@ -10,8 +10,11 @@ async function createFood(req, res) {
         if (!req.foodPartner) return res.status(401).json({ message: "Please login as food partner" });
 
         if (!req.file) {
+            console.log('createFood: no req.file present', { headers: req.headers });
             return res.status(400).json({ message: "No video file provided" })
         }
+
+        console.log('createFood: file present', { originalname: req.file.originalname, size: req.file.size, mimetype: req.file.mimetype });
 
         const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid())
 
