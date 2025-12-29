@@ -164,17 +164,6 @@ const CreateFood = () => {
                             <label className="btn-ghost" htmlFor="chooseInput">Choose File</label>
                           </div>
                         </div>
-                            <div className="file-dropzone-inner">
-                                <svg className="file-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <path d="M10.8 3.2a1 1 0 0 1 .4-.08h1.6a1 1 0 0 1 1 1v1.6h1.6a1 1 0 0 1 1 1v1.6h1.6a1 1 0 0 1 1 1v7.2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6.4a1 1 0 0 1 1-1h1.6V3.2a1 1 0 0 1 1-1h1.6a1 1 0 0 1 .6.2z" stroke="currentColor" strokeWidth="1.5" />
-                                    <path d="M9 12.75v-1.5c0-.62.67-1 1.2-.68l4.24 2.45c.53.3.53 1.05 0 1.35L10.2 16.82c-.53.31-1.2-.06-1.2-.68v-1.5" fill="currentColor" />
-                                </svg>
-                                <div className="file-dropzone-text">
-                                    <strong>Tap to upload</strong> or drag and drop
-                                </div>
-                                <div className="file-hint">MP4, WebM, MOV • Up to ~100MB</div>
-                            </div>
-                        </div>
 
                         {fileError && <p className="error-text" role="alert">{fileError}</p>}
                         {serverError && <p className="error-text" role="alert">{serverError}</p>}
