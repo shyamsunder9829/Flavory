@@ -8,11 +8,23 @@ const cors = require('cors');
 
 const app = express();
 
-// use FRONTEND_URL from environment in production, fallback to localhost in dev
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+// FRONTEND_URL can be a comma-separated list of allowed origins (e.g. "http://localhost:5173,https://your-site.netlify.app")
+const FRONTEND_URLS = (process.env.FRONTEND_URL || "http://localhost:5173").split(',').map(s => s.trim());
+console.log('Allowed frontend origins:', FRONTEND_URLS);
 // trust proxy when running behind a proxy (Render, Heroku, etc.) so secure cookies work correctly
 app.set('trust proxy', 1);
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        // allow non-browser requests like curl/postman (no origin)
+        if (!origin) return callback(null, true);
+        if (FRONTEND_URLS.includes(origin)) return callback(null, true);
+        return callback(new Error('CORS policy: Origin not allowed'));
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
