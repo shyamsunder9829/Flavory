@@ -31,7 +31,7 @@ app.use(express.json());
 // Simple request logger to aid debugging
 app.use((req, res, next) => {
     try {
-        console.log('>>', req.method, req.path, { body: req.body, cookies: req.cookies });
+        console.log('>>', req.method, req.path, { body: req.body, cookies: req.cookies, origin: req.headers.origin });
     } catch (err) {
         console.error('request logger error:', err);
     }
